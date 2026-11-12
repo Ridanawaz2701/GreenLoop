@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="GreenLoop: book and manage neighbourhood recycling pickups in Rawalpindi.">
+  <title>GreenLoop – Recycling Pickup Coordinator</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to main content</a>
+
+  <header class="site-header">
+    <div class="container header-inner">
+      <h1 class="brand">♻ GreenLoop <span class="brand-sub">Recycling Pickup Coordinator</span></h1>
+      <nav aria-label="Main navigation">
+        <ul class="nav-list">
+          <li><a href="#slots">Pickup slots</a></li>
+          <li><a href="#request">Request pickup</a></li>
+          <li><a href="#my-requests">My requests</a></li>
+          <li><a href="#about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main" class="container">
+
+    <section class="hero" aria-labelledby="hero-title">
+      <h2 id="hero-title">Schedule a recycling pickup in your neighbourhood</h2>
+      <p>
+        For households and small shops that sort their waste but have no easy way to drop it off.
+        Find a collection slot in your zone, check that your materials are accepted, and book a pickup in under a minute.
+      </p>
+      <ol class="steps">
+        <li>Filter the weekly slots for your zone.</li>
+        <li>Choose materials and estimate the weight.</li>
+        <li>Submit. The app checks capacity and conflicts for you.</li>
+      </ol>
+    </section>
+
+    <!-- INTERACTION 1: filter / search -->
+    <section id="slots" aria-labelledby="slots-title">
+      <h2 id="slots-title">Weekly pickup slots</h2>
+
+      <form id="filter-form" class="panel filters" aria-label="Filter pickup slots" novalidate>
+        <div class="field">
+          <label for="f-search">Search</label>
+          <input type="search" id="f-search" placeholder="e.g. Saddar, glass">
+        </div>
+        <div class="field">
+          <label for="f-zone">Zone</label>
+          <select id="f-zone"><option value="">All zones</option></select>
+        </div>
+        <div class="field">
+          <label for="f-material">Material accepted</label>
+          <select id="f-material"><option value="">Any material</option></select>
+        </div>
+        <div class="field">
+          <label for="f-day">Day</label>
+          <select id="f-day">
+            <option value="">Any day</option>
+            <option>Monday</option><option>Tuesday</option><option>Wednesday</option>
+            <option>Thursday</option><option>Friday</option><option>Saturday</option>
+          </select>
+        </div>
+        <div class="field check-field">
+          <input type="checkbox" id="f-available">
+          <label for="f-available">Only slots with space</label>
+        </div>
+        <div class="field">
+          <button type="button" id="f-reset" class="btn btn-secondary">Reset filters</button>
+        </div>
+      </form>
+
+      <p id="results-count" class="results-count" role="status" aria-live="polite"></p>
+      <div id="slot-list" class="slot-grid"></div>
+      <p id="empty-slots" class="empty" hidden>
+        No slots match your filters. Try a different day or material, or reset the filters.
+      </p>
+    </section>
+
+    <!-- INTERACTION 2: form + calculation + conflict check -->
+    <section id="request" aria-labelledby="request-title">
+      <h2 id="request-title">Request a pickup</h2>
+
+      <div class="request-layout">
+        <form id="request-form" class="panel" novalidate>
+          <div id="form-errors" class="alert alert-error" role="alert" tabindex="-1" hidden></div>
+          <div id="form-success" class="alert alert-success" role="status" hidden></div>
+
+          <fieldset>
+            <legend>Your details</legend>
+            <div class="field">
+              <label for="r-name">Full name <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="r-name" name="name" required minlength="3" maxlength="60" autocomplete="name">
+            </div>
+            <div class="field">
+              <label for="r-phone">Mobile number <span class="req" aria-hidden="true">*</span></label>
+              <input type="tel" id="r-phone" name="phone" required inputmode="numeric"
+                     pattern="03[0-9]{2}-?[0-9]{7}" placeholder="0300-1234567" autocomplete="tel">
+              <small>Format: 03XX-XXXXXXX</small>
+            </div>
+            <div class="field">
+              <label for="r-address">Pickup address <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="r-address" name="address" required minlength="8" maxlength="120"
+                     placeholder="House / street / block" autocomplete="street-address">
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Slot</legend>
+            <div class="field">
+              <label for="r-zone">Zone <span class="req" aria-hidden="true">*</span></label>
+              <select id="r-zone" name="zone" required><option value="">Choose a zone</option></select>
+            </div>
+            <div class="field">
+              <label for="r-slot">Pickup slot <span class="req" aria-hidden="true">*</span></label>
+              <select id="r-slot" name="slot" required disabled><option value="">Choose a zone first</option></select>
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Materials <span class="req" aria-hidden="true">*</span></legend>
+            <div id="material-options" class="checks"></div>
+            <div class="field">
+              <label for="r-weight">Estimated total weight (kg) <span class="req" aria-hidden="true">*</span></label>
+              <input type="number" id="r-weight" name="weight" required min="1" max="200" step="0.5" inputmode="decimal">
+            </div>
+            <div class="field">
+              <label for="r-notes">Notes for the collector (optional)</label>
+              <textarea id="r-notes" name="notes" rows="3" maxlength="200"></textarea>
+            </div>
+          </fieldset>
+
+          <button type="submit" class="btn">Submit pickup request</button>
+        </form>
+
+        <aside class="panel summary" aria-labelledby="summary-title" aria-live="polite">
+          <h3 id="summary-title">Live estimate</h3>
+          <dl>
+            <dt>Slot</dt><dd id="s-slot">Not selected</dd>
+            <dt>Space left</dt><dd id="s-space">–</dd>
+            <dt>Max load per request</dt><dd id="s-max">–</dd>
+            <dt>Materials</dt><dd id="s-materials">None selected</dd>
+            <dt>Estimated eco-credit</dt><dd id="s-credit" class="credit">Rs 0</dd>
+          </dl>
+          <p class="hint">Credit is an estimate. The total weight is split evenly across the materials you pick, then multiplied by each material's rate per kg.</p>
+        </aside>
+      </div>
+    </section>
+
+    <section id="my-requests" aria-labelledby="mine-title">
+      <h2 id="mine-title">My requests</h2>
+      <p id="no-requests" class="empty">You haven't made any requests yet.</p>
+      <ul id="request-list" class="request-list"></ul>
+    </section>
+
+    <section id="about" aria-labelledby="about-title" class="panel">
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
