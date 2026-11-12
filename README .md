@@ -3,7 +3,7 @@
 CS344 Web Engineering · Assignment 1 (Client-side web application) · BESE-14B
 
 - **Assigned idea:** #19 Recycling Pickup Coordinator
-- **Live URL:** `<your GitHub Pages URL>`
+- **Live URL:** https://ridanawaz2701.github.io/GreenLoop/
 
 ## What it does
 
@@ -44,10 +44,9 @@ Semantic HTML5, CSS (variables, Flexbox, Grid, breakpoints at 600px and 992px), 
 - 8 student-created sample slot records (`SLOTS` in `app.js`)
 
 ## Screenshots
-- `screenshots/mobile.png`
-- `screenshots/tablet.png`
-- `screenshots/desktop.png`
-
+![Mobile view](screenshots/mobile.png)
+![Tablet view](screenshots/tablet.png)
+![Desktop view](screenshots/desktop.png)
 ## Attribution and AI disclosure
 
 All code is original apart from AI assistance (Claude by Anthropic) used to generate the initial draft of the project, which I reviewed, tested and can explain. No third-party libraries, images or templates are used. All sample data is fictional. No credentials or private data are included.
